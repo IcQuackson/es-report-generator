@@ -17,34 +17,38 @@ with open("config.json", "r", encoding="utf-8") as file:
 
 FEATURES = config["features"]
 SUBGROUPS = config["subgroups"]
+START_DATE = config.get("creation_date", "YYYY-MM-DD")  # Default placeholder
+
+# Convert START_DATE to ISO format
+START_DATE_ISO = f"{START_DATE}T00:00:00Z"
 
 # Headers for API authentication
 HEADERS = {"PRIVATE-TOKEN": PRIVATE_TOKEN}
 
-# GitLab API Endpoints
+# GitLab API Endpoints with Date Filtering
 def get_issues(feature_label):
-    """Fetch issues based on the feature label."""
-    url = f"{GITLAB_URL}/api/v4/projects/{PROJECT_ID}/issues?labels={feature_label}"
+    """Fetch issues based on feature label and creation date."""
+    url = f"{GITLAB_URL}/api/v4/projects/{PROJECT_ID}/issues?labels={feature_label}&created_after={START_DATE_ISO}"
     response = requests.get(url, headers=HEADERS)
     return response.json() if response.status_code == 200 else []
 
 def get_merge_requests(feature_label):
-    """Fetch merge requests based on the feature label."""
-    url = f"{GITLAB_URL}/api/v4/projects/{PROJECT_ID}/merge_requests?labels={feature_label}"
+    """Fetch merge requests based on feature label and creation date."""
+    url = f"{GITLAB_URL}/api/v4/projects/{PROJECT_ID}/merge_requests?labels={feature_label}&created_after={START_DATE_ISO}"
     response = requests.get(url, headers=HEADERS)
     return response.json() if response.status_code == 200 else []
 
 def format_report():
     """Generate the full report according to the provided template."""
-    report = "# ES P2 submission, Group NN\n\n## Did your group use the base code provided?\n\nYes / No\n\n"
+    report = f"# ES P2 Submission - Issues & MRs Created After {START_DATE}\n\n## Did your group use the base code provided?\n\nYes / No\n\n"
 
     for feature, label in FEATURES.items():
-        # Fetch issues and MRs for the feature
+        # Fetch issues and MRs for the feature and date range
         issues = get_issues(label)
         merge_requests = get_merge_requests(label)
 
-        report += f"\n## Feature {feature}\n\n### Subgroup\n"
-        
+        report += f"\n## Feature {feature} - Created After {START_DATE}\n\n### Subgroup\n"
+
         for member in SUBGROUPS[feature]:
             # Filter issues assigned to the user
             assigned_issues = [
@@ -74,7 +78,8 @@ def format_report():
 generated_report = format_report()
 
 # Save to a markdown file
-with open("P2.md", "w", encoding="utf-8") as file:
+output_file = f"P2.md"
+with open(output_file, "w", encoding="utf-8") as file:
     file.write(generated_report)
 
-print("Report successfully generated: GitLab_Project_Report.md")
+print(f"Report successfully generated: {output_file}")
