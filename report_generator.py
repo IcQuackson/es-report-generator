@@ -1,8 +1,9 @@
 import requests
-# use .env file
+import json
 from dotenv import load_dotenv
 import os
 
+# Load environment variables
 load_dotenv()
 
 # GitLab Configuration
@@ -10,33 +11,15 @@ GITLAB_URL = os.environ.get("GITLAB_URL")
 PROJECT_ID = os.environ.get("PROJECT_ID")
 PRIVATE_TOKEN = os.environ.get("ACCESS_TOKEN")
 
-print(GITLAB_URL, PROJECT_ID, PRIVATE_TOKEN)
+# Load Team Configuration from JSON
+with open("config.json", "r", encoding="utf-8") as file:
+    config = json.load(file)
+
+FEATURES = config["features"]
+SUBGROUPS = config["subgroups"]
 
 # Headers for API authentication
 HEADERS = {"PRIVATE-TOKEN": PRIVATE_TOKEN}
-
-# Feature Labels in GitLab
-FEATURES = {
-    "CA": "Suggest Activity",
-    "SP": "Volunteer Profile",
-    "AI": "Institution Profile"
-}
-
-# Subgroups with names, istID, and GitLab usernames
-SUBGROUPS = {
-    "CA": [
-        {"name": "Pedro Gonçalves", "istID": "ist187559", "username": "ist187559"},
-        {"name": "Martim Garcia dos Anjos", "istID": "ist1103704", "username": "ist1103704"}
-    ],
-    "SP": [
-        {"name": "Xavier Augusto", "istID": "ist1106997", "username": "ist1106997"},
-        {"name": "Luísa Folques Cardoso", "istID": "ist1106871", "username": "ist1106871"}
-    ],
-    "AI": [
-        {"name": "Tomás de Sousa Santos", "istID": "ist1104111", "username": "ist1104111"},
-        {"name": "Diogo Pinto", "istID": "ist1103976", "username": "ist1103976"}
-    ]
-}
 
 # GitLab API Endpoints
 def get_issues(feature_label):
@@ -91,7 +74,7 @@ def format_report():
 generated_report = format_report()
 
 # Save to a markdown file
-with open("GitLab_Project_Report.md", "w", encoding="utf-8") as file:
+with open("P2.md", "w", encoding="utf-8") as file:
     file.write(generated_report)
 
 print("Report successfully generated: GitLab_Project_Report.md")
