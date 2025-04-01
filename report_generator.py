@@ -2,24 +2,26 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
+import argparse
+import sys
 
 load_dotenv()
 
-GITLAB_URL = os.environ.get("GITLAB_URL")
-PROJECT_ID = os.environ.get("PROJECT_ID")
-PRIVATE_TOKEN = os.environ.get("ACCESS_TOKEN")
+CONFIG_FILE = None
+GITLAB_URL = None
+PROJECT_ID = None
+PRIVATE_TOKEN = None
+FEATURES = None
+SUBGROUPS = None
+START_DATE = None
+START_DATE_ISO = None
+HEADERS = None
 
-with open("config.json", "r", encoding="utf-8") as file:
-    config = json.load(file)
-
-FEATURES = config["features"]
-SUBGROUPS = config["subgroups"]
-START_DATE = config.get("creation_date", "YYYY-MM-DD")
-
-START_DATE_ISO = f"{START_DATE}T00:00:00Z"
-
-HEADERS = {"PRIVATE-TOKEN": PRIVATE_TOKEN}
-
+def parse_args():
+    parser = argparse.ArgumentParser(description="Generate a report based on GitLab issues and merge requests.")
+    parser.add_argument("-c", "--config", type=str, default="config.json", help="Path to the config file (default: config.json)")
+    parser.add_argument("-o", "--output", type=str, default="P2.md", help="Path to the output file (default: P2.md)")
+    return parser.parse_args()
 
 def get_group_number():
     """Fetch the group number from the project name."""
@@ -86,10 +88,26 @@ def format_report():
 
     return report
 
+args = parse_args()
+CONFIG_FILE = args.config
+if not os.path.isfile(CONFIG_FILE):
+    print(f"Error: Config file '{CONFIG_FILE}' not found.")
+    sys.exit(1)
+
+GITLAB_URL = os.environ.get("GITLAB_URL")
+PROJECT_ID = os.environ.get("PROJECT_ID")
+PRIVATE_TOKEN = os.environ.get("ACCESS_TOKEN")
+
+with open(CONFIG_FILE, "r", encoding="utf-8") as file:
+    config = json.load(file)
+
+FEATURES = config["features"]
+SUBGROUPS = config["subgroups"]
+START_DATE = config.get("creation_date", "YYYY-MM-DD")
+START_DATE_ISO = f"{START_DATE}T00:00:00Z"
+HEADERS = {"PRIVATE-TOKEN": PRIVATE_TOKEN}
+
 generated_report = format_report()
-
-output_file = f"P2.md"
-with open(output_file, "w", encoding="utf-8") as file:
+with open(args.output, "w", encoding="utf-8") as file:
     file.write(generated_report)
-
-print(f"Report successfully generated: {output_file}")
+print(f"Report successfully generated: {args.output}")
