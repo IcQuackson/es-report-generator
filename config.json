@@ -1,23 +1,23 @@
 {
     "features": {
-        "CA": "Suggest Activity",
-        "SP": "Volunteer Profile",
-        "AI": "Institution Profile"
+        "SA": "Suggest Activity",
+        "VP": "Volunteer Profile",
+        "IP": "Institution Profile"
     },
     "subgroups": {
-        "CA": [
+        "SA": [
             {"name": "Pedro Gonçalves", "istID": "ist187559", "username": "ist187559"},
             {"name": "Martim Garcia dos Anjos", "istID": "ist1103704", "username": "ist1103704"}
         ],
-        "SP": [
+        "VP": [
             {"name": "Xavier Augusto", "istID": "ist1106997", "username": "ist1106997"},
             {"name": "Luísa Folques Cardoso", "istID": "ist1106871", "username": "ist1106871"}
         ],
-        "AI": [
+        "IP": [
             {"name": "Tomás de Sousa Santos", "istID": "ist1104111", "username": "ist1104111"},
             {"name": "Diogo Pinto", "istID": "ist1103976", "username": "ist1103976"}
         ]
     },
-    "creation_date": "2025-03-09"
+    "creation_date": "2025-03-16"
 }
 
